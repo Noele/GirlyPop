@@ -1,0 +1,8 @@
+## Interface: 30403
+## Title : GirlyPop
+## Notes: Good girl tools
+## Author: ZoeyBee (Code), MariBee (Artwork)
+## SavedVariables: GirlyPopDB
+GirlyPop.xml
+GirlyPop.lua
+notes\Notes.lua
