@@ -7,71 +7,71 @@ local fontPath = "Interface\\AddOns\\GirlyPop\\res\\Fonts\\PixelMplus10.ttf" -- 
 --[[
     FRAME
 --]]
-local GirlyPopFrame = CreateFrame("Frame", "GirlyPopMainFrame", UIParent)
-GirlyPopFrame:SetSize(402, 536)
-GirlyPopFrame:SetPoint("CENTER", UIParent, "CENTER")
-GirlyPopFrame:EnableMouse(true)
-GirlyPopFrame:SetMovable(true)
-GirlyPopFrame:RegisterForDrag("LeftButton")
-GirlyPopFrame:SetScript("OnDragStart", GirlyPopFrame.StartMoving)
-GirlyPopFrame:SetScript("OnDragStop", GirlyPopFrame.StopMovingOrSizing)
+local GirlyPopNotesFrame = CreateFrame("Frame", "GirlyPopMainFrame", UIParent)
+GirlyPopNotesFrame:SetSize(571, 599)
+GirlyPopNotesFrame:SetPoint("CENTER", UIParent, "CENTER")
+GirlyPopNotesFrame:EnableMouse(true)
+GirlyPopNotesFrame:SetMovable(true)
+GirlyPopNotesFrame:RegisterForDrag("LeftButton")
+GirlyPopNotesFrame:SetScript("OnDragStart", GirlyPopNotesFrame.StartMoving)
+GirlyPopNotesFrame:SetScript("OnDragStop", GirlyPopNotesFrame.StopMovingOrSizing)
 
 --[[
     EDIT BOX
 --]]
-local GirlyPopEditBox = CreateFrame("EditBox", "GirlyPopEditBox", GirlyPopFrame)
-GirlyPopEditBox:SetSize(362, 536)
-GirlyPopEditBox:SetPoint("BOTTOM", GirlyPopFrame, 5, 20)
-GirlyPopEditBox:SetAutoFocus(false)
-GirlyPopEditBox:SetMaxLetters(256)
-GirlyPopEditBox:SetMultiLine(true)
-GirlyPopEditBox:SetFont(fontPath, 30, "OUTLINE")
+local GirlyPopNotesEditBox = CreateFrame("EditBox", "GirlyPopEditBox", GirlyPopNotesFrame)
+GirlyPopNotesEditBox:SetSize(362, 536)
+GirlyPopNotesEditBox:SetPoint("BOTTOM", GirlyPopNotesFrame, -40, 50)
+GirlyPopNotesEditBox:SetAutoFocus(false)
+GirlyPopNotesEditBox:SetMaxLetters(256)
+GirlyPopNotesEditBox:SetMultiLine(true)
+GirlyPopNotesEditBox:SetFont(fontPath, 30, "OUTLINE")
 
 --[[
     PAGE NUMBERS (1/5) ECT
 --]]
-local PageNumberText = GirlyPopFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-PageNumberText:SetPoint("TOPRIGHT", GirlyPopFrame, "TOPRIGHT",  -20, -55)  -- Position the text in the center of the frame
-PageNumberText:SetFont(fontPath, 30, "OUTLINE")
+local PageNumberText = GirlyPopNotesFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+PageNumberText:SetPoint("TOPRIGHT", GirlyPopNotesFrame, "TOPRIGHT",  -150, -95)  -- Position the text in the center of the frame
+PageNumberText:SetFont(fontPath, 15, "OUTLINE")
 PageNumberText:SetTextColor(1, 1, 1, 1)
 PageNumberText:SetText("( 1 / 1 )")
 
 --[[
     FRAME TEXTURE
 --]]
-local uiTexture = GirlyPopFrame:CreateTexture(nil, "ARTWORK")
+local uiTexture = GirlyPopNotesFrame:CreateTexture(nil, "ARTWORK")
 uiTexture:SetTexture("Interface\\AddOns\\GirlyPop\\res\\Textures\\ui.tga")
-uiTexture:SetAllPoints(GirlyPopFrame)
+uiTexture:SetAllPoints(GirlyPopNotesFrame)
 uiTexture:SetTexCoord(0, 1, 0, 1)
 
 --[[
     LEFT PAGE BUTTON
 --]]
-local pageLeftButton = CreateFrame("Button", "GirlyPopPageLeft", GirlyPopFrame, "UIPanelButtonTemplate")
-pageLeftButton:SetSize(100, 30)
-pageLeftButton:SetPoint("BOTTOMRIGHT", GirlyPopFrame, "BOTTOMRIGHT", 100, 30)
+local pageLeftButton = CreateFrame("Button", "GirlyPopPageLeft", GirlyPopNotesFrame)
+pageLeftButton:SetSize(100, 50)
+pageLeftButton:SetPoint("BOTTOMRIGHT", GirlyPopNotesFrame, "BOTTOMRIGHT", -5, 30)
 pageLeftButton:SetText("<--")
 
 --[[
     RIGHT PAGE BUTTON
 --]]
-local pageRightButton = CreateFrame("Button", "GirlyPopPageRightButton", GirlyPopFrame, "UIPanelButtonTemplate")
-pageRightButton:SetSize(100, 30)
-pageRightButton:SetPoint("BOTTOMRIGHT", GirlyPopFrame, "BOTTOMRIGHT", 100, 0)
+local pageRightButton = CreateFrame("Button", "GirlyPopPageRightButton", GirlyPopNotesFrame)
+pageRightButton:SetSize(100, 50)
+pageRightButton:SetPoint("BOTTOMRIGHT", GirlyPopNotesFrame, "BOTTOMRIGHT", -5, 85)
 pageRightButton:SetText("-->")
 
 --[[
     EXIT BUTTON
 --]]
-local EscapeButton = CreateFrame("Button", "GirlyPopPageRightButton", GirlyPopFrame)
+local EscapeButton = CreateFrame("Button", "GirlyPopPageRightButton", GirlyPopNotesFrame)
 EscapeButton:SetSize(30, 30)
-EscapeButton:SetPoint("TOPRIGHT", GirlyPopFrame, "TOPRIGHT", -10, -5)
+EscapeButton:SetPoint("TOPRIGHT", GirlyPopNotesFrame, "TOPRIGHT", -145, -40)
 
 --[[
     EXIT BUTTON ON CLICK EVENT
 --]]
 function EscapeButton_OnClick()
-    GirlyPopFrame:Hide()
+    GirlyPopNotesFrame:Hide()
 end
 
 --[[
@@ -82,7 +82,7 @@ function RightButton_OnClick()
     if GirlyPopDB.pages[index] == nil then
         GirlyPopDB.pages[index] = ""
     end
-    GirlyPopEditBox:SetText(GirlyPopDB.pages[index] or "")
+    GirlyPopNotesEditBox:SetText(GirlyPopDB.pages[index] or "")
     PageNumberText:SetText("( " .. index .. " / " .. #GirlyPopDB.pages .. " )")
 end
 
@@ -94,7 +94,7 @@ function LeftButton_OnClick()
     if index < 1 then
         index = 1
     end
-    GirlyPopEditBox:SetText(GirlyPopDB.pages[index] or "")
+    GirlyPopNotesEditBox:SetText(GirlyPopDB.pages[index] or "")
     PageNumberText:SetText("( " .. index .. " / " .. #GirlyPopDB.pages .. " )")
 end
 
@@ -102,8 +102,8 @@ end
     SLASH COMMAND, FIRED WHEN "/GirlyNotes" is used
 --]]
 function GirlyPopFrame_SlashCommand()
-    GirlyPopFrame:Show()
-    GirlyPopEditBox:SetText(GirlyPopDB.pages[index] or "")
+    GirlyPopNotesFrame:Show()
+    GirlyPopNotesEditBox:SetText(GirlyPopDB.pages[index] or "")
 end
 
 --[[
@@ -113,8 +113,7 @@ local function OnEditBoxTextChanged(self)
     GirlyPopDB.pages[index] = self:GetText()
 end
 
-
-GirlyPopEditBox:SetScript("OnTextChanged", OnEditBoxTextChanged) -- ON TEXT CHANGED Script Assignment
+GirlyPopNotesEditBox:SetScript("OnTextChanged", OnEditBoxTextChanged) -- ON TEXT CHANGED Script Assignment
 pageLeftButton:SetScript("OnClick", LeftButton_OnClick) -- PAGE LEFT BUTTON Script Assignment
 pageRightButton:SetScript("OnClick", RightButton_OnClick) -- PAGE RIGHT BUTTON Script Assignment
 EscapeButton:SetScript("OnClick", EscapeButton_OnClick) -- EXIT BUTTON Script Assignment
@@ -122,4 +121,4 @@ EscapeButton:SetScript("OnClick", EscapeButton_OnClick) -- EXIT BUTTON Script As
 SLASH_GirlyPopFrame1 = "/GirlyNotes";
 SlashCmdList["GirlyPopFrame"] = GirlyPopFrame_SlashCommand; -- SLASH COMMAND Script Assignment
 
-GirlyPopFrame:Hide() -- Hide the frame by default.
+GirlyPopNotesFrame:Hide() -- Hide the frame by default.
