@@ -7,3 +7,4 @@ GirlyPop.xml
 GirlyPop.lua
 notes\Notes.lua
 calculator\Calculator.lua
+killcount\KillCount.lua

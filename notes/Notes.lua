@@ -98,12 +98,18 @@ function LeftButton_OnClick()
     PageNumberText:SetText("( " .. index .. " / " .. #GirlyPopDB.pages .. " )")
 end
 
+
 --[[
     SLASH COMMAND, FIRED WHEN "/GirlyNotes" is used
 --]]
 function GirlyPopFrame_SlashCommand()
-    GirlyPopNotesFrame:Show()
-    GirlyPopNotesEditBox:SetText(GirlyPopDB.pages[index] or "")
+    if GirlyPopNotesFrame:IsShown() then
+        GirlyPopNotesFrame:Hide()
+    else
+        GirlyPopNotesFrame:Show()
+
+        GirlyPopNotesEditBox:SetText(GirlyPopDB.pages[index] or "")
+    end
 end
 
 --[[

@@ -1,7 +1,11 @@
 local fontPath = "Interface\\AddOns\\GirlyPop\\res\\Fonts\\PixelMplus10.ttf" -- FONT USED FOR TEXT ENTERED
 
+GirlyPopDB = GirlyPopDB or {} -- DB INITIALISATION
+GirlyPopDB.calculatorhistory = GirlyPopDB.calculatorhistory or {} -- DB PAGE INITIALISATION
+
 local currentOperation = ""
 local firstInput = 0
+
 --[[
     FRAME
 --]]
@@ -13,6 +17,44 @@ GirlyPopCalculatorFrame:SetMovable(true)
 GirlyPopCalculatorFrame:RegisterForDrag("LeftButton")
 GirlyPopCalculatorFrame:SetScript("OnDragStart", GirlyPopCalculatorFrame.StartMoving)
 GirlyPopCalculatorFrame:SetScript("OnDragStop", GirlyPopCalculatorFrame.StopMovingOrSizing)
+
+--[[
+    HISTORY FRAME
+--]]
+local GirlyPopcalculatorhistoryFrame = CreateFrame("Frame", "GirlyPopcalculatorhistoryFrame", UIParent)
+GirlyPopcalculatorhistoryFrame:SetSize(100, 600)
+GirlyPopcalculatorhistoryFrame:SetPoint("CENTER", UIParent, "CENTER")
+GirlyPopcalculatorhistoryFrame:EnableMouse(true)
+GirlyPopcalculatorhistoryFrame:SetMovable(true)
+GirlyPopcalculatorhistoryFrame:RegisterForDrag("LeftButton")
+GirlyPopcalculatorhistoryFrame:SetScript("OnDragStart", GirlyPopcalculatorhistoryFrame.StartMoving)
+GirlyPopcalculatorhistoryFrame:SetScript("OnDragStop", GirlyPopcalculatorhistoryFrame.StopMovingOrSizing)
+
+--[[
+    HISTORY EDIT BOX
+--]]
+local GirlyPopcalculatorhistoryEditBox = CreateFrame("EditBox", "GirlyPopcalculatorhistoryEditBox", GirlyPopcalculatorhistoryFrame, "InputBoxTemplate")
+GirlyPopcalculatorhistoryEditBox:SetSize(100, 600)
+GirlyPopcalculatorhistoryEditBox:SetPoint("CENTER", GirlyPopcalculatorhistoryFrame, "CENTER", 0, 0)
+GirlyPopcalculatorhistoryEditBox:SetAutoFocus(false)
+GirlyPopcalculatorhistoryEditBox:SetMaxLetters(256)
+GirlyPopcalculatorhistoryEditBox:SetMultiLine(true)
+GirlyPopcalculatorhistoryEditBox:SetFont(fontPath, 15, "OUTLINE")
+GirlyPopcalculatorhistoryEditBox:SetScript("OnMouseDown", function(self)
+    self:ClearFocus()
+end)
+
+GirlyPopcalculatorhistoryEditBox:SetScript("OnKeyDown", function(self, key)
+    self:ClearFocus()
+end)
+
+--[[
+    HISTORY TEXTURE
+--]]
+local GirlyPopcalculatorhistoryFrameTexture = GirlyPopcalculatorhistoryFrame:CreateTexture(nil, "ARTWORK")
+GirlyPopcalculatorhistoryFrameTexture:SetTexture("Interface\\AddOns\\GirlyPop\\res\\Textures\\calculator.tga")
+GirlyPopcalculatorhistoryFrameTexture:SetAllPoints(GirlyPopcalculatorhistoryFrame)
+GirlyPopcalculatorhistoryFrameTexture:SetTexCoord(0, 1, 0, 1)
 
 --[[
     FRAME TEXTURE
@@ -67,15 +109,25 @@ end
 
 local function Calculate()
     if currentOperation ~= "" then
+        chIndex = 0
+        if GirlyPopDB.calculatorhistory ~= nil then
+            chIndex = #GirlyPopDB.calculatorhistory + 1
+        else
+            GirlyPopDB.calculatorhistory = {}
+            chIndex = 1
+        end
         if currentOperation == "+" then
             GirlyPopCalculatorEditBox:SetText(firstInput + tonumber(GirlyPopCalculatorEditBox:GetText()))
             currentOperation = ""
+            GirlyPopDB.calculatorhistory[chIndex] = GirlyPopCalculatorEditBox:GetText()
         elseif currentOperation == "-" then
             GirlyPopCalculatorEditBox:SetText(firstInput - tonumber(GirlyPopCalculatorEditBox:GetText()))
             currentOperation = ""
+            GirlyPopDB.calculatorhistory[chIndex] = GirlyPopCalculatorEditBox:GetText()
         elseif currentOperation == "*" then
             GirlyPopCalculatorEditBox:SetText(firstInput * tonumber(GirlyPopCalculatorEditBox:GetText()))
             currentOperation = ""
+            GirlyPopDB.calculatorhistory[chIndex] = GirlyPopCalculatorEditBox:GetText()
         elseif currentOperation == "/" then
             if firstInput == 0 or tonumber(GirlyPopCalculatorEditBox:GetText()) == 0 then
                 currentOperation = ""
@@ -84,6 +136,7 @@ local function Calculate()
             else
                 GirlyPopCalculatorEditBox:SetText(firstInput / tonumber(GirlyPopCalculatorEditBox:GetText()))
                 currentOperation = ""
+                GirlyPopDB.calculatorhistory[chIndex] = GirlyPopCalculatorEditBox:GetText()
             end
         end
     end
@@ -273,18 +326,45 @@ local GirlyPopCalculatorClearButton = CreateFrame("Button", "GirlyPopCalculatorD
 GirlyPopCalculatorClearButton:SetSize(90, 30)
 GirlyPopCalculatorClearButton:SetPoint("BOTTOMLEFT", GirlyPopCalculatorFrame, "BOTTOMLEFT", 30, 90)
 GirlyPopCalculatorClearButton:SetText("CLS")
-GirlyPopCalculatorClearButton:SetScript("Onclick", function()
+GirlyPopCalculatorClearButton:SetScript("OnClick", function()
     ClearInput()
+    currentOperation = ""
+end)
+
+--[[
+    History BUTTON
+--]]
+local GirlyPopcalculatorhistoryButton = CreateFrame("Button", "GirlyPopCalculatorDivideButton", GirlyPopCalculatorFrame, "UIPanelButtonTemplate")
+GirlyPopcalculatorhistoryButton:SetSize(30, 30)
+GirlyPopcalculatorhistoryButton:SetPoint("BOTTOMLEFT", GirlyPopCalculatorFrame, "BOTTOMLEFT", 150, -30)
+GirlyPopcalculatorhistoryButton:SetText("H")
+GirlyPopcalculatorhistoryButton:SetScript("OnClick", function ()
+    if GirlyPopcalculatorhistoryFrame:IsShown() then
+        GirlyPopcalculatorhistoryFrame:Hide()
+    else
+        GirlyPopcalculatorhistoryFrame:Show()
+        output = table.concat(GirlyPopDB.calculatorhistory, "\n") -- Use value directly since pairs returns both key and value
+
+
+        GirlyPopcalculatorhistoryEditBox:SetText(output or "No history.")
+
+    end
 end)
 
 --[[
     SLASH COMMAND, FIRED WHEN "/GirlyCalculator" is used
 --]]
 function GirlyPopCalculator_SlashCommand()
-    GirlyPopCalculatorFrame:Show()
+    if GirlyPopCalculatorFrame:IsShown() then
+        GirlyPopCalculatorFrame:Hide()
+        GirlyPopcalculatorhistoryFrame:Hide()
+    else
+        GirlyPopCalculatorFrame:Show()
+    end
 end
 
 SLASH_GirlyPopCalculator1 = "/GirlyCalculator";
 SlashCmdList["GirlyPopCalculator"] = GirlyPopCalculator_SlashCommand; -- SLASH COMMAND Script Assignment
 
+GirlyPopcalculatorhistoryFrame:Hide()
 GirlyPopCalculatorFrame:Hide() -- Hide the frame by default.
